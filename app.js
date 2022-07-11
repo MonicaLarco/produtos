@@ -40,7 +40,15 @@ app.post('/produtos', (req, res) => {
 });
 
 // Update Product details
-
+app.put('/produtos/:id', (req, res) => {
+    let id = Number.parseInt(req.params.id);
+    let changes = req.body;
+    let idx = lista_produtos.produtos.findIndex((elem) => elem.id == id);
+    if (idx > -1) {
+        lista_produtos.produtos[idx] = changes;
+        res.status(200).json({message:"Product updated", details: lista_produtos.produtos[idx]});
+    }
+});
 
 
 // Delete a Product
