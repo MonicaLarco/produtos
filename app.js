@@ -1,8 +1,6 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // Product list
 const lista_produtos = {
@@ -15,36 +13,44 @@ const lista_produtos = {
     ]
 };
 
-
 app.listen(port, () => console.info(`Listening on ${ port }`));
+app.use(express.json());
 
 // Get Product list
-app.get('/produtos', function(req, res) {
+app.get('/produtos', (req, res) => {
     res.json(lista_produtos);
 });
 
 //Get Product ID
-app.get('/produtos/:id', function(req, res) {
+app.get('/produtos/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     let idx = lista_produtos.produtos.findIndex((elem) => elem.id == id);
     if (idx > -1) {
         res.json(lista_produtos.produtos[idx]);
     } else {
-        res.status(404).json({message: "Produto não encontrado"});
+        res.status(404).json({message: "Product not found"});
     }
 });
 
 // Add a new product
-app.post('/produtos', urlencodedParser, function(req, res) {
-    if (!req.body){
-        res.status(404);
-        res.send('Error');
-    } else {
-        lista_produtos.produtos.push(req.body);
-        res.send(`New product details: ${req.body}`);
-    }
+app.post('/produtos', (req, res) => {
+    const productInfo = req.body;
+    lista_produtos.produtos.push(productInfo);
+    res.status(201).json({message:"New product added!", details: productInfo});
 });
 
+// Update Product details
+
+
+
 // Delete a Product
+app.delete('/produtos/:id', (req, res) => {
+    let id = Number.parseInt(req.params.id);
+    let idx = lista_produtos.produtos.findIndex((elem) => elem.id == id);
+    if (idx > -1) {
+        let removeProduct = lista_produtos.produtos.splice(idx, 1);
+        res.status(200).json({message:"Product deleted!", details: removeProduct});
+    }
+});
 
 
